@@ -1,6 +1,16 @@
 using UnityEngine;
 using System.Collections;
 
+public enum InputButtonType
+{
+	MOUSE_LEFT,
+	MOUSE_RIGHT,
+	GAME_A,
+	GAME_B,
+	GAME_X,
+	GAME_Y,
+}
+
 public class InputManager : MonoBehaviour 
 {
 	public static InputManager instance;
@@ -9,12 +19,17 @@ public class InputManager : MonoBehaviour
 
 	public delegate void OnInputKeyDelegate(KeyCode key);
 	public delegate void OnInputAxisDelegate(float deltaX, float deltaY);
+	public delegate void OnInputButtonDelegate(InputButtonType btype, bool isDown);
 	public OnInputKeyDelegate HandleKey;
 	public OnInputAxisDelegate HandleAxis;
+	public OnInputButtonDelegate HandleButton;
 
 	private Vector2 mouseVec = new Vector2();
 	public Vector2 MouseVec { get { return mouseVec; } }
 	Vector2[] touchListAnchor;
+
+	private bool hasMouzeZero;
+	public bool HasMouzeZero { get { return hasMouzeZero; } }
 
 	public InputManager()
 	{
@@ -26,6 +41,7 @@ public class InputManager : MonoBehaviour
 	{
 		HandleKey = DefaultHandleKey;
 		HandleAxis = DefaultHandleAxis;
+		HandleButton = DefaultHandleButton;
 	}
 	
 	
@@ -72,6 +88,12 @@ public class InputManager : MonoBehaviour
 		{
 			HandleKey(KeyCode.Space);
 		} 
+		bool mouseZero = Input.GetMouseButton(0);
+		if (hasMouzeZero != mouseZero)
+		{
+			hasMouzeZero = mouseZero;
+			HandleButton(InputButtonType.MOUSE_LEFT, hasMouzeZero);
+		}
 	}
 
 	public void UpdateSwipe()
@@ -120,6 +142,10 @@ public class InputManager : MonoBehaviour
 	{
 		HandleKey += del;
 	}
+	public void AddInput(OnInputButtonDelegate del)
+	{
+		HandleButton += del;
+	}
 
 	public void RemoveInput(OnInputAxisDelegate del)
 	{
@@ -128,6 +154,10 @@ public class InputManager : MonoBehaviour
 	public void RemoveInput(OnInputKeyDelegate del)
 	{
 		HandleKey -= del;
+	}
+	public void RemoveInput(OnInputButtonDelegate del)
+	{
+		HandleButton -= del;
 	}
 
 	void DefaultHandleKey(KeyCode key)
@@ -141,6 +171,11 @@ public class InputManager : MonoBehaviour
 		{
 			//Debug.Log(x+" "+y);
 		}
+	}
+
+	void DefaultHandleButton(InputButtonType btype, bool isDown)
+	{
+
 	}
 
 	public void MouseDrag()

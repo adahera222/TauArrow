@@ -11,6 +11,7 @@ public struct ControllerData
 	public float jumpDuration;
 	public float landDuration;
 	public float crouchDuration;
+	public float chargeDuration;
 }
 
 public class TauController : MonoBehaviour
@@ -30,6 +31,7 @@ public class TauController : MonoBehaviour
 	public float jumpDuration = -1f;
 	public float landDuration = -1f;
 	public float crouchDuration = -1f;
+	public float chargeDuration = -1f;
 	public bool timeDirty = false;
 	public bool didCrouch = false;
 
@@ -42,6 +44,7 @@ public class TauController : MonoBehaviour
 		if (actor.isHuman)
 		{
 			InputManager.Instance.AddInput(HandleAxis);
+			InputManager.Instance.AddInput(HandleButton);
 		}
 		cData = Globals.Hero;
 		rigidbody2D.fixedAngle = true;
@@ -57,6 +60,7 @@ public class TauController : MonoBehaviour
     	timeAlive += deltaTime;
     	if (jumpDuration > 0f) { jumpDuration -= deltaTime; }
     	if (landDuration > 0f) { landDuration -= deltaTime; }
+    	if (chargeDuration > 0f) { chargeDuration -= deltaTime; }
     	if (crouchDuration > 0f) 
     	{ 
     		crouchDuration -= deltaTime; 
@@ -78,6 +82,19 @@ public class TauController : MonoBehaviour
     	aimY = InputManager.Instance.MouseVec.y - gameObject.transform.position.y;
     	aimAngle = Mathf.Atan2(aimX, aimY) * Mathf.Rad2Deg;
     }
+
+
+	public void HandleButton(InputButtonType btype, bool isDown)
+	{
+		if (isDown)
+		{
+			chargeDuration = cData.chargeDuration;
+		}
+		else
+		{
+			actor.ShootArrow(chargeDuration <= 0f);
+		}
+	}
 
     public void HandleAxis(float x, float y)
     {
@@ -114,6 +131,10 @@ public class TauController : MonoBehaviour
 	    			crouchDuration = cData.crouchDuration;
 	    			timeDirty = true;	
 	    		}
+    		}
+    		else
+    		{
+    			chargeDuration = -1f;
     		}
 
     		rigidbody2D.AddForce(new Vector2(forceX,forceY));

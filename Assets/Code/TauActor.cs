@@ -37,6 +37,8 @@ public class TauActor : TauObject
 	public SpriteRenderer bodySprite;
 	public SpriteRenderer bowSprite;
 	public bool faceLeft = true;
+
+	public TauObject currentArrow;
 	
 
 	public override void Awake()
@@ -73,6 +75,7 @@ public class TauActor : TauObject
 		newScale.x = faceLeft ? 1f : -1f;
 		bodySprite.gameObject.transform.localScale = newScale;
     	bowSprite.gameObject.transform.localScale = newScale;
+    	
 	}
 
 	public SpriteType GetAim()
@@ -90,8 +93,8 @@ public class TauActor : TauObject
 		{
 			return SpriteType.AIMSTRAIGHT;
 		}
-		
 	}
+
     public override void Update()
     {
     	CheckFacing();
@@ -118,6 +121,7 @@ public class TauActor : TauObject
     			SetSprite(GetAim());	
     		}
     	}
+    	CheckArrow();
     }
 
     public void SetSprite(SpriteType val)
@@ -130,6 +134,82 @@ public class TauActor : TauObject
     	int mappedIndex = (int)val;
     	bodySprite.sprite = bodySprites[mappedIndex];
     	bowSprite.sprite = bowSprites[mappedIndex];
+
+    }
+
+    public void AddArrow(TauObject obj)
+    {
+    	obj.SetPhysicsEnabled(false);
+    	currentArrow = obj;
+    	CheckFacing();
+    	CheckArrow();
+    }
+
+    public void CheckArrow()
+    {
+
+    	if (currentArrow != null)
+    	{
+    		currentArrow.transform.localScale = bowSprite.gameObject.transform.localScale;
+
+    		Vector3 arrowPos = this.transform.position;
+    		Vector3 arrowAngles = Vector3.zero;
+    		float arrowScaleX = currentArrow.transform.localScale.x;
+    		switch (currentSprite)
+    		{
+    			case SpriteType.AIMDOWN:
+    			{
+    				arrowPos.x += arrowScaleX*Globals.ARROW_POS_DOWN.x;
+    				arrowPos.y += Globals.ARROW_POS_DOWN.y;
+    				arrowAngles.z += arrowScaleX*Globals.ARROW_ROT_DOWN;
+    				currentArrow.objSprite.enabled = true;
+    				break;
+    			}
+    			case SpriteType.AIMUP:
+    			{
+    				arrowPos.x += arrowScaleX*Globals.ARROW_POS_UP.x;
+    				arrowPos.y += Globals.ARROW_POS_UP.y;
+    				arrowAngles.z += arrowScaleX*Globals.ARROW_ROT_UP;
+    				currentArrow.objSprite.enabled = true;
+    				break;
+    			}
+    			case SpriteType.AIMSTRAIGHT:
+    			{
+    				arrowPos.x += arrowScaleX*Globals.ARROW_POS_STRAIGHT.x;
+    				arrowPos.y += Globals.ARROW_POS_STRAIGHT.y;
+    				arrowAngles.z += arrowScaleX*Globals.ARROW_ROT_STRAIGHT;
+    				currentArrow.objSprite.enabled = true;
+    				break;
+    			}
+    			default:
+    			{
+    				currentArrow.objSprite.enabled = false;
+    				break;
+    			}
+    		}
+    		currentArrow.transform.position = arrowPos;
+    		currentArrow.transform.localEulerAngles = arrowAngles;
+    	}
+    }
+
+    public void ShootArrow(bool hasCharged)
+    {
+    	if (currentArrow != null)
+    	{
+    		float arrowScaleX = currentArrow.transform.localScale.x;
+	    	float launchZ = arrowScaleX * currentArrow.transform.localEulerAngles.z * Mathf.Deg2Rad;
+	    	float launchStrength = hasCharged ? 70f : 40f;
+	    	float forceX = arrowScaleX * launchStrength * Mathf.Cos(launchZ);
+	    	float forceY = launchStrength * Mathf.Sin(launchZ);
+	    	currentArrow.rigidbody2D.isKinematic = false;
+	    	currentArrow.rigidbody2D.AddForce(new Vector2(forceX,forceY));
+			currentArrow.DelayedPhysics(0.2f);
+	    	currentArrow = null;
+	    }
+	    else
+	    {
+	    	AddArrow(TauDirector.Instance.factory.GetNextArrow());
+	    }
     }
 
 
