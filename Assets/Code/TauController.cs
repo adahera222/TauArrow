@@ -19,6 +19,11 @@ public class TauController : MonoBehaviour
 	private ControllerData cData;
 	public bool isInit = false;
 	public bool isFlying = true;
+	public float aimX = 0f;
+	public float aimY = 0f;
+	public float aimAngle = 0f;
+
+
 	public HashSet<GameObject> contactFloors = new HashSet<GameObject>();
 
 	public float timeAlive = -1f;
@@ -68,6 +73,10 @@ public class TauController : MonoBehaviour
 				timeDirty = true;
     		}
     	}
+
+    	aimX = InputManager.Instance.MouseVec.x - gameObject.transform.position.x;
+    	aimY = InputManager.Instance.MouseVec.y - gameObject.transform.position.y;
+    	aimAngle = Mathf.Atan2(aimX, aimY) * Mathf.Rad2Deg;
     }
 
     public void HandleAxis(float x, float y)

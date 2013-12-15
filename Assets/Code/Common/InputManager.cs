@@ -12,7 +12,8 @@ public class InputManager : MonoBehaviour
 	public OnInputKeyDelegate HandleKey;
 	public OnInputAxisDelegate HandleAxis;
 
-	protected Vector2 mouseVec = new Vector2();
+	private Vector2 mouseVec = new Vector2();
+	public Vector2 MouseVec { get { return mouseVec; } }
 	Vector2[] touchListAnchor;
 
 	public InputManager()

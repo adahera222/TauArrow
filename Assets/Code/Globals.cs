@@ -11,7 +11,7 @@
 		Hero.runForce = 10f;
 		Hero.flyForce = 2f;
 		Hero.jumpDuration = 0.5f;
-		Hero.landDuration = 0.05f;
+		Hero.landDuration = 0.2f;
 		Hero.crouchDuration = 0.1f;
 	}
 }

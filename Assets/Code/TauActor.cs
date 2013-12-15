@@ -17,9 +17,11 @@ using System.Collections.Generic;
             \|
 */
 
-public enum Spritetime
+public enum SpriteType
 {
-	NORMAL,
+	AIMDOWN,
+	AIMUP,
+	AIMSTRAIGHT,
 	JUMP,
 	CROUCH,
 	LAND,
@@ -29,9 +31,12 @@ public class TauActor : TauObject
 {
 	public TauController controller;
 	public bool isHuman = true;
-	public Sprite[] sprites;
-	public Spritetime currentSprite;
-	public SpriteRenderer spriteRenderer;
+	public Sprite[] bodySprites;
+	public Sprite[] bowSprites;
+	public SpriteType currentSprite;
+	public SpriteRenderer bodySprite;
+	public SpriteRenderer bowSprite;
+	public bool faceLeft = true;
 	
 
 	public override void Awake()
@@ -41,9 +46,8 @@ public class TauActor : TauObject
 	public override void InitStart()
 	{
 		controller = this.GetComponent<TauController>();
-		spriteRenderer = this.GetComponent<SpriteRenderer>();
 		controller.InitStart(this);
-		SetSprite(Spritetime.NORMAL);
+		SetSprite(SpriteType.AIMSTRAIGHT);
 		base.InitStart();
 	}
 	public override void InitFinish()
@@ -56,34 +60,67 @@ public class TauActor : TauObject
 	{
 
 	}
+
+	public void CheckFacing()
+	{
+		bool shouldFaceLeft = (controller.aimX > 0f);
+		if (faceLeft == shouldFaceLeft)
+		{
+			return;
+		}
+		faceLeft = shouldFaceLeft;
+		Vector3 newScale = Vector3.one;
+		newScale.x = faceLeft ? 1f : -1f;
+		bodySprite.gameObject.transform.localScale = newScale;
+    	bowSprite.gameObject.transform.localScale = newScale;
+	}
+
+	public SpriteType GetAim()
+	{
+		float absAngle = Mathf.Abs(controller.aimAngle);
+		if (absAngle > 120f)
+		{
+			return SpriteType.AIMDOWN;
+		}
+		else if (absAngle < 60f)
+		{
+			return SpriteType.AIMUP;
+		}
+		else
+		{
+			return SpriteType.AIMSTRAIGHT;
+		}
+		
+	}
     public override void Update()
     {
-    	if (controller.timeDirty || currentSprite != Spritetime.NORMAL)
+    	CheckFacing();
+    	//if (controller.timeDirty || currentSprite != SpriteType.NORMAL)
     	{
     		if (controller.landDuration > 0f)
     		{
-    			SetSprite(Spritetime.LAND);
+    			SetSprite(SpriteType.LAND);
     		}
     		else if (controller.jumpDuration > 0f)
     		{
-    			SetSprite(Spritetime.JUMP);
+    			SetSprite(SpriteType.JUMP);
     		}
     		else if (controller.crouchDuration > 0f)
     		{
-    			SetSprite(Spritetime.CROUCH);
+    			SetSprite(SpriteType.CROUCH);
     		}
     		else if (controller.isFlying)
     		{
-    			SetSprite(Spritetime.JUMP);		
+    			SetSprite(GetAim());		
     		}
     		else
     		{
-    			SetSprite(Spritetime.NORMAL);	
+    			SetSprite(GetAim());	
     		}
     	}
     }
 
-    public void SetSprite(Spritetime val)
+    public void SetSprite(SpriteType val)
     {
     	if (val == currentSprite)
     	{
@@ -91,7 +128,8 @@ public class TauActor : TauObject
     	}
     	currentSprite = val;
     	int mappedIndex = (int)val;
-    	spriteRenderer.sprite = sprites[mappedIndex];
+    	bodySprite.sprite = bodySprites[mappedIndex];
+    	bowSprite.sprite = bowSprites[mappedIndex];
     }
 
 
