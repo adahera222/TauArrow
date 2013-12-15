@@ -24,7 +24,7 @@ public class Globals
 		HeroCData.maxRunVelocity = 2f;
 		HeroCData.jumpDuration = 0.5f;
 		HeroCData.landDuration = 0.2f;
-		HeroCData.crouchDuration = 0.1f;
+		HeroCData.crouchDuration = 0.3f;
 		HeroCData.chargeDuration = 0.2f;
 		HeroCData.reloadDuration = -1f;
 
@@ -41,7 +41,7 @@ public class Globals
 		BaddieCData.maxRunVelocity = 1f;
 		BaddieCData.jumpDuration = 0.5f;
 		BaddieCData.landDuration = 0.2f;
-		BaddieCData.crouchDuration = 0.1f;
+		BaddieCData.crouchDuration = 0.3f;
 		BaddieCData.chargeDuration = 0.3f;
 		BaddieCData.reloadDuration = 2f;
 

@@ -112,7 +112,7 @@ public class TauBody : MonoBehaviour
     public void Update()
     {
     	CheckFacing();
-    	//if (controller.timeDirty || currentAction != SpriteAction.NORMAL)
+    	
     	{
     		if (actor.controller.landDuration > 0f)
     		{

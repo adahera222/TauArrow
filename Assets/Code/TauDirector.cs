@@ -40,6 +40,7 @@ public class TauDirector : MonoBehaviour
 		{
 			yield return null;
 		}
+		TauHUD.Instance.focused = hero.controller;
 
 		TauObject arrow = world.CreateArrow();
 		hero.AddArrow(arrow);

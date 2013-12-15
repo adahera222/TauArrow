@@ -18,7 +18,7 @@ public struct ControllerData
 
 public class TauController : MonoBehaviour
 {
-	private TauActor actor;
+	public TauActor actor;
 	private ControllerData cData;
 
 	public InputButtonType shootButton;
@@ -35,6 +35,9 @@ public class TauController : MonoBehaviour
 	public float posX = 0f;
 	public float posY = 0f;
 
+	public float forceX = 0f;
+    public float forceY = 0f;
+
 	public HashSet<GameObject> contactFloors = new HashSet<GameObject>();
 
 	public float timeAlive = -1f;
@@ -43,7 +46,7 @@ public class TauController : MonoBehaviour
 	public float crouchDuration = -1f;
 	public float chargeDuration = -1f;
 	public float reloadDuration = -1f;
-	public bool timeDirty = false;
+	
 	public bool didCrouch = false;
 	public bool isShooting = false;
 
@@ -106,7 +109,7 @@ public class TauController : MonoBehaviour
     		if (CanLand)
     		{
     			landDuration = cData.landDuration;
-				timeDirty = true;
+				
     		}
     	}
 
@@ -171,8 +174,8 @@ public class TauController : MonoBehaviour
     	
     	if (Mathf.Abs(x) > 0 || Mathf.Abs(y) > 0)
     	{
-    		float forceX = x;
-    		float forceY = y;
+    		forceX = x;
+    		forceY = y;
     		forceX *= isFlying ? cData.flyForce : cData.runForce;
     		if (forceY > 0.01f)
     		{
@@ -181,7 +184,7 @@ public class TauController : MonoBehaviour
 		    		forceY *= didCrouch ? cData.crouchJumpForce : cData.normalJumpForce;
     				didCrouch = false;
 	    			jumpDuration = cData.jumpDuration;
-	    			timeDirty = true;
+	    			
 	    			rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, 0f);
 	    		}
 	    		else
@@ -194,8 +197,10 @@ public class TauController : MonoBehaviour
     			if (CanCrouch)
     			{
     				forceY = 0f;
-    				crouchDuration = cData.crouchDuration;
-	    			timeDirty = true;	
+    				if (!didCrouch)
+    				{
+    					crouchDuration = cData.crouchDuration;
+    				}
     			}
     			else
     			{
