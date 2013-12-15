@@ -35,6 +35,7 @@ public class TauActor : TauObject
     public int weapon = 0;
 	
 	public TauObject currentArrow;
+    public TauObject retrieveArrow;
 	
 
 	public override void Awake()
@@ -73,7 +74,7 @@ public class TauActor : TauObject
 
     public override void Update()
     {
-    	
+    	CheckRetrieveArrow();
     }
 
     public void AddArrow(TauObject obj)
@@ -145,6 +146,39 @@ public class TauActor : TauObject
 			currentArrow.DelayedPhysics(0.2f);
 	    	currentArrow = null;
 	    }
+    }
+
+    public void RetrieveArrow()
+    {
+        if (retrieveArrow == null)
+        {
+            retrieveArrow = TauWorld.Instance.FindArrow(this);
+            retrieveArrow.rigidbody2D.velocity *= 0f;
+        }
+
+    }
+    public void CheckRetrieveArrow()
+    {
+        if (retrieveArrow != null)
+        {
+            float deltaX = controller.posX - retrieveArrow.gameObject.transform.position.x;
+            float deltaY = controller.posY - retrieveArrow.gameObject.transform.position.y;
+            if (Mathf.Abs(deltaX) < 1f && Mathf.Abs(deltaY) < 1f)
+            {
+                AddArrow(retrieveArrow);
+                retrieveArrow = null;
+            }
+            else
+            {
+                Vector2 deltaDir = new Vector2(deltaX, deltaY);
+                deltaDir.Normalize();
+                float forceX = deltaDir.x*30f;
+                float forceY = deltaDir.y*30f;
+                retrieveArrow.rigidbody2D.isKinematic = false;
+                retrieveArrow.collider2D.enabled = false;
+                retrieveArrow.rigidbody2D.AddForce(new Vector2(forceX, forceY));
+            }
+        }
     }
 
 

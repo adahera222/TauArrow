@@ -113,7 +113,7 @@ public class TauAI : MonoBehaviour
 	public void Scan(ref TauAI_Stimulus stimulus)
 	{
 		stimulus.curPos = new Vector2(controller.posX, controller.posY);
-		stimulus.target = TauDirector.Instance.FindActor(actor);
+		stimulus.target = TauWorld.Instance.FindActor(actor);
 		stimulus.targetPos = new Vector2(stimulus.target.controller.posX, stimulus.target.controller.posY);
 	}
 
@@ -133,7 +133,8 @@ public class TauAI : MonoBehaviour
 
 		if (decision.shouldShoot)
 		{
-			controller.HandleButton(InputButtonType.MOUSE_LEFT, false);
+			controller.HandleButton(controller.shootButton, true);
+			controller.HandleButton(controller.shootButton, false);
 		}
 
 	}

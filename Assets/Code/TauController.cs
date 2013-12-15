@@ -20,6 +20,9 @@ public class TauController : MonoBehaviour
 {
 	private TauActor actor;
 	private ControllerData cData;
+
+	public InputButtonType shootButton;
+	public InputButtonType retrieveButton;
 	public bool isInit = false;
 	public bool isFlying = true;
 	public float aimX = 0f;
@@ -42,6 +45,7 @@ public class TauController : MonoBehaviour
 	public float reloadDuration = -1f;
 	public bool timeDirty = false;
 	public bool didCrouch = false;
+	public bool isShooting = false;
 
 	public bool ValidJump { get { return !isFlying || contactFloors.Count > 0; } }
 	public bool CanJump { get { return ValidJump && jumpDuration <= 0f && landDuration <= 0f; } }
@@ -54,6 +58,8 @@ public class TauController : MonoBehaviour
 	public void InitStart(TauActor p_actor)
 	{
 		actor = p_actor;
+		shootButton = InputButtonType.MOUSE_LEFT;
+		retrieveButton = InputButtonType.MOUSE_RIGHT;
 		if (actor.isHuman)
 		{
 			InputManager.Instance.AddInput(HandleAxis);
@@ -122,27 +128,42 @@ public class TauController : MonoBehaviour
     }
 
 
-	public void HandleButton(InputButtonType btype, bool isDown)
+	public void HandleButton(InputButtonType bType, bool isDown)
 	{
-		if (actor.currentArrow != null)
+		if (bType == this.shootButton)
 		{
-			if (isDown)
+			if (actor.currentArrow != null)
 			{
-				chargeDuration = cData.chargeDuration;
+				if (isDown && !isShooting)
+				{
+					chargeDuration = cData.chargeDuration;
+					isShooting = true;
+				}
+				else if (!isDown && isShooting)
+				{
+					actor.ShootArrow(chargeDuration <= 0f);
+					reloadDuration = cData.reloadDuration;
+					chargeDuration = -1f;
+					isShooting = false;
+				}
 			}
 			else
 			{
-				actor.ShootArrow(chargeDuration <= 0f);
-				reloadDuration = cData.reloadDuration;
+				if (isDown && CanReload)
+				{
+					actor.AddArrow(TauDirector.Instance.factory.GetNextArrow());
+				}
 			}
 		}
-		else
+		else if (bType == this.retrieveButton)
 		{
-			if (CanReload)
+			if (isDown)
 			{
-				actor.AddArrow(TauDirector.Instance.factory.GetNextArrow());
+				isShooting = false;
+				actor.RetrieveArrow();
 			}
 		}
+
 	}
 
     public void HandleAxis(float x, float y)
@@ -183,7 +204,7 @@ public class TauController : MonoBehaviour
     		}
     		else
     		{
-    			chargeDuration = -1f;
+    			crouchDuration = -1f;
     		}
 
     		rigidbody2D.AddForce(new Vector2(forceX,forceY));

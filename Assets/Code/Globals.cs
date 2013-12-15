@@ -25,7 +25,7 @@ public class Globals
 		HeroCData.jumpDuration = 0.5f;
 		HeroCData.landDuration = 0.2f;
 		HeroCData.crouchDuration = 0.1f;
-		HeroCData.chargeDuration = 1f;
+		HeroCData.chargeDuration = 0.2f;
 		HeroCData.reloadDuration = -1f;
 
 		HeroAData = new ActorData();
@@ -42,7 +42,7 @@ public class Globals
 		BaddieCData.jumpDuration = 0.5f;
 		BaddieCData.landDuration = 0.2f;
 		BaddieCData.crouchDuration = 0.1f;
-		BaddieCData.chargeDuration = 1f;
+		BaddieCData.chargeDuration = 0.3f;
 		BaddieCData.reloadDuration = 2f;
 
 		BaddieAData = new ActorData();

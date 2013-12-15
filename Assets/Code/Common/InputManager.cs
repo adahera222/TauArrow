@@ -28,8 +28,10 @@ public class InputManager : MonoBehaviour
 	public Vector2 MouseVec { get { return mouseVec; } }
 	Vector2[] touchListAnchor;
 
-	private bool hasMouzeZero;
-	public bool HasMouzeZero { get { return hasMouzeZero; } }
+	private bool hasMouseLeft;
+	public bool HasMouseLeft { get { return hasMouseLeft; } }
+	private bool hasMouseRight;
+	public bool HasMouseRight { get { return hasMouseRight; } }
 
 	public InputManager()
 	{
@@ -88,11 +90,18 @@ public class InputManager : MonoBehaviour
 		{
 			HandleKey(KeyCode.Space);
 		} 
-		bool mouseZero = Input.GetMouseButton(0);
-		if (hasMouzeZero != mouseZero)
+		bool mouseLeft = Input.GetMouseButton(0);
+		if (hasMouseLeft != mouseLeft)
 		{
-			hasMouzeZero = mouseZero;
-			HandleButton(InputButtonType.MOUSE_LEFT, hasMouzeZero);
+			hasMouseLeft = mouseLeft;
+			HandleButton(InputButtonType.MOUSE_LEFT, hasMouseLeft);
+		}
+
+		bool mouseRight = Input.GetMouseButton(1);
+		if (hasMouseRight != mouseRight)
+		{
+			hasMouseRight = mouseRight;
+			HandleButton(InputButtonType.MOUSE_RIGHT, hasMouseRight);
 		}
 	}
 
