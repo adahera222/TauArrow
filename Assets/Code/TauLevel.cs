@@ -34,7 +34,7 @@ public class TauLevelData
         for(int i=0; i<100; ++i)
         {
             float newX = (i*0.3f)-15f;
-            float newY = Random.Range(-2f,-3f);
+            float newY = Random.Range(-1,-3);
             mData.Add(new TerrainData{ mType = TerrainType.FLOOR_SQUARE, x=newX, y=newY} );
         }
     }

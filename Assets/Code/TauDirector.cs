@@ -12,6 +12,8 @@ public class TauDirector : MonoBehaviour
 	// Use this for initialization
 	IEnumerator Start () 
 	{
+		Globals.Load();
+		
 		level.LoadLevel();
 		while(!level.isLoaded)
 		{

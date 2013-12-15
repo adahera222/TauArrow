@@ -21,6 +21,7 @@ public enum Spritetime
 {
 	NORMAL,
 	JUMP,
+	CROUCH,
 	LAND,
 	YAY,
 }
@@ -59,16 +60,19 @@ public class TauActor : TauObject
     {
     	if (controller.timeDirty || currentSprite != Spritetime.NORMAL)
     	{
-    		float currentTime = controller.timeAlive;
-    		if (currentTime - controller.timeLanding < 0.2f)
+    		if (controller.landDuration > 0f)
     		{
     			SetSprite(Spritetime.LAND);
     		}
-    		else if (currentTime - controller.timeJumping < 0.2f)
+    		else if (controller.jumpDuration > 0f)
     		{
     			SetSprite(Spritetime.JUMP);
     		}
-    		else if (!controller.isOnFloor)
+    		else if (controller.crouchDuration > 0f)
+    		{
+    			SetSprite(Spritetime.CROUCH);
+    		}
+    		else if (controller.isFlying)
     		{
     			SetSprite(Spritetime.JUMP);		
     		}
