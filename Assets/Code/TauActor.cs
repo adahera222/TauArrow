@@ -17,27 +17,22 @@ using System.Collections.Generic;
             \|
 */
 
-public enum SpriteType
+public struct ActorData
 {
-	AIMDOWN,
-	AIMUP,
-	AIMSTRAIGHT,
-	JUMP,
-	CROUCH,
-	LAND,
-	YAY,
+    public int HP;
+    public int weapon;
 }
+
+
 public class TauActor : TauObject
 {
+    public ActorData aData;
 	public TauController controller;
+    public TauBody body;
 	public bool isHuman = true;
-	public Sprite[] bodySprites;
-	public Sprite[] bowSprites;
-	public SpriteType currentSprite;
-	public SpriteRenderer bodySprite;
-	public SpriteRenderer bowSprite;
-	public bool faceLeft = true;
-
+    public int HP = 10;
+    public int weapon = 0;
+	
 	public TauObject currentArrow;
 	
 
@@ -49,12 +44,23 @@ public class TauActor : TauObject
 	{
 		controller = this.GetComponent<TauController>();
 		controller.InitStart(this);
-		SetSprite(SpriteType.AIMSTRAIGHT);
+        body = this.GetComponent<TauBody>();
+        body.InitStart(this);
+        if (isHuman)
+        {
+            aData = Globals.HeroAData;
+        }
+        else
+        {
+            aData = Globals.BaddieAData;    
+        }
 		base.InitStart();
 	}
 	public override void InitFinish()
 	{
+        HP = aData.HP;
 		controller.InitFinish();
+        body.InitFinish();
 		base.InitFinish();
 	}
 
@@ -63,85 +69,17 @@ public class TauActor : TauObject
 
 	}
 
-	public void CheckFacing()
-	{
-		bool shouldFaceLeft = (controller.aimX > 0f);
-		if (faceLeft == shouldFaceLeft)
-		{
-			return;
-		}
-		faceLeft = shouldFaceLeft;
-		Vector3 newScale = Vector3.one;
-		newScale.x = faceLeft ? 1f : -1f;
-		bodySprite.gameObject.transform.localScale = newScale;
-    	bowSprite.gameObject.transform.localScale = newScale;
-    	
-	}
-
-	public SpriteType GetAim()
-	{
-		float absAngle = Mathf.Abs(controller.aimAngle);
-		if (absAngle > 120f)
-		{
-			return SpriteType.AIMDOWN;
-		}
-		else if (absAngle < 60f)
-		{
-			return SpriteType.AIMUP;
-		}
-		else
-		{
-			return SpriteType.AIMSTRAIGHT;
-		}
-	}
 
     public override void Update()
     {
-    	CheckFacing();
-    	//if (controller.timeDirty || currentSprite != SpriteType.NORMAL)
-    	{
-    		if (controller.landDuration > 0f)
-    		{
-    			SetSprite(SpriteType.LAND);
-    		}
-    		else if (controller.jumpDuration > 0f)
-    		{
-    			SetSprite(SpriteType.JUMP);
-    		}
-    		else if (controller.crouchDuration > 0f)
-    		{
-    			SetSprite(SpriteType.CROUCH);
-    		}
-    		else if (controller.isFlying)
-    		{
-    			SetSprite(GetAim());		
-    		}
-    		else
-    		{
-    			SetSprite(GetAim());	
-    		}
-    	}
-    	CheckArrow();
-    }
-
-    public void SetSprite(SpriteType val)
-    {
-    	if (val == currentSprite)
-    	{
-    		return;
-    	}
-    	currentSprite = val;
-    	int mappedIndex = (int)val;
-    	bodySprite.sprite = bodySprites[mappedIndex];
-    	bowSprite.sprite = bowSprites[mappedIndex];
-
+    	
     }
 
     public void AddArrow(TauObject obj)
     {
     	obj.SetPhysicsEnabled(false);
     	currentArrow = obj;
-    	CheckFacing();
+    	body.CheckFacing();
     	CheckArrow();
     }
 
@@ -150,14 +88,14 @@ public class TauActor : TauObject
 
     	if (currentArrow != null)
     	{
-    		currentArrow.transform.localScale = bowSprite.gameObject.transform.localScale;
+    		currentArrow.transform.localScale = body.bodySprite.gameObject.transform.localScale;
 
     		Vector3 arrowPos = this.transform.position;
     		Vector3 arrowAngles = Vector3.zero;
     		float arrowScaleX = currentArrow.transform.localScale.x;
-    		switch (currentSprite)
+    		switch (body.currentAction)
     		{
-    			case SpriteType.AIMDOWN:
+    			case SpriteAction.AIMDOWN:
     			{
     				arrowPos.x += arrowScaleX*Globals.ARROW_POS_DOWN.x;
     				arrowPos.y += Globals.ARROW_POS_DOWN.y;
@@ -165,7 +103,7 @@ public class TauActor : TauObject
     				currentArrow.objSprite.enabled = true;
     				break;
     			}
-    			case SpriteType.AIMUP:
+    			case SpriteAction.AIMUP:
     			{
     				arrowPos.x += arrowScaleX*Globals.ARROW_POS_UP.x;
     				arrowPos.y += Globals.ARROW_POS_UP.y;
@@ -173,7 +111,7 @@ public class TauActor : TauObject
     				currentArrow.objSprite.enabled = true;
     				break;
     			}
-    			case SpriteType.AIMSTRAIGHT:
+    			case SpriteAction.AIMSTRAIGHT:
     			{
     				arrowPos.x += arrowScaleX*Globals.ARROW_POS_STRAIGHT.x;
     				arrowPos.y += Globals.ARROW_POS_STRAIGHT.y;

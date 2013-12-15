@@ -50,6 +50,7 @@ public class TauFactory : MonoBehaviour
             toAdd.transform.parent = allInactiveChunks.transform;
             toAdd.SetActive(false);
             TauChunk toAddChunk = toAdd.GetComponent<TauChunk>();
+            toAddChunk.InitStart();
             mChunkList.Add(toAddChunk); 
         }
         mLastChunkIndex = 0;
@@ -70,6 +71,8 @@ public class TauFactory : MonoBehaviour
         GameObject toAdd = Instantiate(sPrototypeHero, new Vector3(0,0,0), Quaternion.identity) as GameObject;
         //toAdd.transform.parent = allActors.transform;
         TauActor toAddActor = toAdd.GetComponent<TauActor>();
+        toAddActor.isHuman = true;
+        toAddActor.InitStart();
         return toAddActor;
     }
 
@@ -78,6 +81,7 @@ public class TauFactory : MonoBehaviour
         GameObject toAdd = Instantiate(sPrototypeArrow, new Vector3(0,0,0), Quaternion.identity) as GameObject;
         //toAdd.transform.parent = allObjects.transform;
         TauObject toAddObject = toAdd.GetComponent<TauObject>();
+        toAddObject.InitStart();
         return toAddObject;
     }
 
@@ -86,6 +90,8 @@ public class TauFactory : MonoBehaviour
         GameObject toAdd = Instantiate(sPrototypeBaddie, new Vector3(0,0,0), Quaternion.identity) as GameObject;
         //toAdd.transform.parent = allActors.transform;
         TauActor toAddActor = toAdd.GetComponent<TauActor>();
+        toAddActor.isHuman = false;
+        toAddActor.InitStart();
         return toAddActor;
     }
 

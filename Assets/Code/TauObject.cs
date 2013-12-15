@@ -28,7 +28,6 @@ public class TauObject : MonoBehaviour
 	public virtual void Awake()
 	{
 		objSprite = this.GetComponent<SpriteRenderer>();
-		InitStart();
 	}
 	public virtual void InitStart()
 	{

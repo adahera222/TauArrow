@@ -8,6 +8,7 @@ public struct ControllerData
 	public float crouchJumpForce;
 	public float runForce;
 	public float flyForce;
+	public float maxRunVelocity;
 	public float jumpDuration;
 	public float landDuration;
 	public float crouchDuration;
@@ -24,6 +25,9 @@ public class TauController : MonoBehaviour
 	public float aimY = 0f;
 	public float aimAngle = 0f;
 
+	public float velX = 0f;
+	public float velY = 0f;
+
 
 	public HashSet<GameObject> contactFloors = new HashSet<GameObject>();
 
@@ -38,23 +42,28 @@ public class TauController : MonoBehaviour
 	public bool CanJump { get { return !isFlying || contactFloors.Count > 0; } }
 
 
-	public virtual void InitStart(TauActor p_actor)
+	public void InitStart(TauActor p_actor)
 	{
 		actor = p_actor;
 		if (actor.isHuman)
 		{
 			InputManager.Instance.AddInput(HandleAxis);
 			InputManager.Instance.AddInput(HandleButton);
+			cData = Globals.HeroCData;
 		}
-		cData = Globals.Hero;
+		else
+		{
+			cData = Globals.BaddieCData;	
+		}
+		
 		rigidbody2D.fixedAngle = true;
 	}
-	public virtual void InitFinish()
+	public void InitFinish()
 	{
 		isInit = true;
 	}
 	
-    public virtual void Update()
+    public void Update()
     {
     	float deltaTime = Time.deltaTime;
     	timeAlive += deltaTime;
@@ -78,9 +87,15 @@ public class TauController : MonoBehaviour
     		}
     	}
 
-    	aimX = InputManager.Instance.MouseVec.x - gameObject.transform.position.x;
-    	aimY = InputManager.Instance.MouseVec.y - gameObject.transform.position.y;
-    	aimAngle = Mathf.Atan2(aimX, aimY) * Mathf.Rad2Deg;
+    	if (actor.isHuman)
+    	{
+	    	aimX = InputManager.Instance.MouseVec.x - gameObject.transform.position.x;
+	    	aimY = InputManager.Instance.MouseVec.y - gameObject.transform.position.y;
+	    	aimAngle = Mathf.Atan2(aimX, aimY) * Mathf.Rad2Deg;
+	    }
+	    velX = Mathf.Clamp(rigidbody2D.velocity.x, -cData.maxRunVelocity, cData.maxRunVelocity);
+	    velY = rigidbody2D.velocity.y;
+	    rigidbody2D.velocity = new Vector2(velX, velY);
     }
 
 

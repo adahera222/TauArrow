@@ -40,7 +40,19 @@ public class TauDirector : MonoBehaviour
 		}
 		TauObject arrow = factory.GetNextArrow();
 		hero.AddArrow(arrow);
+
+		for(int i=0; i<3; ++i)
+		{
+			TauActor baddie = factory.GetNextBaddie();
+			while(!baddie.isInit)
+			{
+				yield return null;
+			}
+		}
 		isInit = true;
+
+		audio.loop = true;
+		audio.Play();
 	}
 	
 	// Update is called once per frame
