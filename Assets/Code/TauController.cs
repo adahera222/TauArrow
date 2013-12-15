@@ -13,6 +13,7 @@ public struct ControllerData
 	public float landDuration;
 	public float crouchDuration;
 	public float chargeDuration;
+	public float reloadDuration;
 }
 
 public class TauController : MonoBehaviour
@@ -28,6 +29,8 @@ public class TauController : MonoBehaviour
 	public float velX = 0f;
 	public float velY = 0f;
 
+	public float posX = 0f;
+	public float posY = 0f;
 
 	public HashSet<GameObject> contactFloors = new HashSet<GameObject>();
 
@@ -36,10 +39,16 @@ public class TauController : MonoBehaviour
 	public float landDuration = -1f;
 	public float crouchDuration = -1f;
 	public float chargeDuration = -1f;
+	public float reloadDuration = -1f;
 	public bool timeDirty = false;
 	public bool didCrouch = false;
 
-	public bool CanJump { get { return !isFlying || contactFloors.Count > 0; } }
+	public bool ValidJump { get { return !isFlying || contactFloors.Count > 0; } }
+	public bool CanJump { get { return ValidJump && jumpDuration <= 0f && landDuration <= 0f; } }
+	public bool CanLand { get { return !isFlying && jumpDuration <= 0f && landDuration <= 0f; } }
+	public bool CanCrouch { get { return !isFlying && crouchDuration <= 0f; } }
+	public bool CanReload { get { return reloadDuration <= 0f; } }
+	
 
 
 	public void InitStart(TauActor p_actor)
@@ -54,9 +63,13 @@ public class TauController : MonoBehaviour
 		else
 		{
 			cData = Globals.BaddieCData;	
+			actor.ai = this.gameObject.AddComponent<TauAI>();
+			actor.ai.InitStart(actor, this);
 		}
 		
 		rigidbody2D.fixedAngle = true;
+
+		InitFinish();
 	}
 	public void InitFinish()
 	{
@@ -70,17 +83,21 @@ public class TauController : MonoBehaviour
     	if (jumpDuration > 0f) { jumpDuration -= deltaTime; }
     	if (landDuration > 0f) { landDuration -= deltaTime; }
     	if (chargeDuration > 0f) { chargeDuration -= deltaTime; }
+    	if (reloadDuration > 0f) { reloadDuration -= deltaTime; }
     	if (crouchDuration > 0f) 
     	{ 
     		crouchDuration -= deltaTime; 
     		didCrouch = crouchDuration <= 0f; 
     	}
 
+    	posX = gameObject.transform.position.x;
+    	posY = gameObject.transform.position.y;
+
     	bool hasY = Mathf.Abs(rigidbody2D.velocity.y) > 0.01f;
     	if (hasY != isFlying)
     	{
     		isFlying = hasY;
-    		if (!isFlying && jumpDuration <= 0f && landDuration <= 0f)
+    		if (CanLand)
     		{
     			landDuration = cData.landDuration;
 				timeDirty = true;
@@ -89,25 +106,42 @@ public class TauController : MonoBehaviour
 
     	if (actor.isHuman)
     	{
-	    	aimX = InputManager.Instance.MouseVec.x - gameObject.transform.position.x;
-	    	aimY = InputManager.Instance.MouseVec.y - gameObject.transform.position.y;
-	    	aimAngle = Mathf.Atan2(aimX, aimY) * Mathf.Rad2Deg;
+	    	SetAim(InputManager.Instance.MouseVec.x - posX, InputManager.Instance.MouseVec.y - posY);
+	    	
 	    }
 	    velX = Mathf.Clamp(rigidbody2D.velocity.x, -cData.maxRunVelocity, cData.maxRunVelocity);
 	    velY = rigidbody2D.velocity.y;
 	    rigidbody2D.velocity = new Vector2(velX, velY);
     }
 
+    public void SetAim(float x, float y)
+    {
+    	aimX = x;
+    	aimY = y;
+    	aimAngle = Mathf.Atan2(aimX, aimY) * Mathf.Rad2Deg;
+    }
+
 
 	public void HandleButton(InputButtonType btype, bool isDown)
 	{
-		if (isDown)
+		if (actor.currentArrow != null)
 		{
-			chargeDuration = cData.chargeDuration;
+			if (isDown)
+			{
+				chargeDuration = cData.chargeDuration;
+			}
+			else
+			{
+				actor.ShootArrow(chargeDuration <= 0f);
+				reloadDuration = cData.reloadDuration;
+			}
 		}
 		else
 		{
-			actor.ShootArrow(chargeDuration <= 0f);
+			if (CanReload)
+			{
+				actor.AddArrow(TauDirector.Instance.factory.GetNextArrow());
+			}
 		}
 	}
 
@@ -121,11 +155,7 @@ public class TauController : MonoBehaviour
     		forceX *= isFlying ? cData.flyForce : cData.runForce;
     		if (forceY > 0.01f)
     		{
-    			if (!CanJump || jumpDuration > 0f || landDuration > 0f)
-		    	{
-		    		forceY = 0f;
-		    	}
-		    	else
+    			if (CanJump)
 		    	{
 		    		forceY *= didCrouch ? cData.crouchJumpForce : cData.normalJumpForce;
     				didCrouch = false;
@@ -133,18 +163,22 @@ public class TauController : MonoBehaviour
 	    			timeDirty = true;
 	    			rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, 0f);
 	    		}
+	    		else
+	    		{
+	    			forceY = 0f;
+		    	}
     		}
     		else if (forceY < -0.01f)
     		{
-    			if (isFlying || crouchDuration > 0f)
+    			if (CanCrouch)
     			{
     				forceY = 0f;
+    				crouchDuration = cData.crouchDuration;
+	    			timeDirty = true;	
     			}
     			else
     			{
     				forceY = 0f;
-	    			crouchDuration = cData.crouchDuration;
-	    			timeDirty = true;	
 	    		}
     		}
     		else

@@ -9,6 +9,7 @@ public class TauDirector : MonoBehaviour
 
 	public TauFactory factory;
 	public TauLevel level;
+	public List<TauActor> actorList;
 
 	public bool isInit = false;
 
@@ -34,16 +35,19 @@ public class TauDirector : MonoBehaviour
 			yield return null;
 		}
 		TauActor hero = factory.GetNextHero();
+		actorList.Add(hero);
 		while(!hero.isInit)
 		{
 			yield return null;
 		}
+
 		TauObject arrow = factory.GetNextArrow();
 		hero.AddArrow(arrow);
 
 		for(int i=0; i<3; ++i)
 		{
 			TauActor baddie = factory.GetNextBaddie();
+			actorList.Add(baddie);
 			while(!baddie.isInit)
 			{
 				yield return null;
@@ -58,5 +62,26 @@ public class TauDirector : MonoBehaviour
 	// Update is called once per frame
 	void Update () {
 	
+	}
+
+	public TauActor FindActor(TauActor src)
+	{
+		float closestSqDist = 999999;
+		TauActor closest = null;
+		for(int i=0; i<actorList.Count; ++i)
+		{
+			TauActor actor = actorList[i];
+			if (actor == src)
+			{
+				continue;
+			}
+			float sqDist = Utilities.DistanceSquared(src, actor);
+			if (sqDist < closestSqDist)
+			{
+				closestSqDist = sqDist;
+				closest = actor;
+			}
+		} 
+		return closest;
 	}
 }

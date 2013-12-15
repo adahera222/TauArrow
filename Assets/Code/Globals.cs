@@ -26,6 +26,7 @@ public class Globals
 		HeroCData.landDuration = 0.2f;
 		HeroCData.crouchDuration = 0.1f;
 		HeroCData.chargeDuration = 1f;
+		HeroCData.reloadDuration = -1f;
 
 		HeroAData = new ActorData();
 		HeroAData.HP = 20;
@@ -42,6 +43,7 @@ public class Globals
 		BaddieCData.landDuration = 0.2f;
 		BaddieCData.crouchDuration = 0.1f;
 		BaddieCData.chargeDuration = 1f;
+		BaddieCData.reloadDuration = 2f;
 
 		BaddieAData = new ActorData();
 		BaddieAData.HP = 10;

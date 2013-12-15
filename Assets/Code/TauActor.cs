@@ -29,6 +29,7 @@ public class TauActor : TauObject
     public ActorData aData;
 	public TauController controller;
     public TauBody body;
+    public TauAI ai;
 	public bool isHuman = true;
     public int HP = 10;
     public int weapon = 0;
@@ -143,10 +144,6 @@ public class TauActor : TauObject
 	    	currentArrow.rigidbody2D.AddForce(new Vector2(forceX,forceY));
 			currentArrow.DelayedPhysics(0.2f);
 	    	currentArrow = null;
-	    }
-	    else
-	    {
-	    	AddArrow(TauDirector.Instance.factory.GetNextArrow());
 	    }
     }
 
