@@ -26,7 +26,8 @@ public class TauAI_Stimulus
 
 public class TauAI_Decision
 {
-	public Vector2 desiredPos;
+	public Vector2 desiredMovePos;
+	public Vector2 desiredShootPos;
 	public bool shouldShoot;
 	public bool shouldJump;
 	public float jumpDuration = -1f;
@@ -57,23 +58,29 @@ public class TauAI_Wander : TauAI_Base
 	public override TauAI_Decision Think(TauAI_Stimulus stimulus)
 	{
 		Vector2 delta = stimulus.targetPos - stimulus.curPos;
-		if (delta.sqrMagnitude > 20f)
+		bool moveTowards = delta.sqrMagnitude > 20f;
+		decision.desiredShootPos = stimulus.targetPos;
+		if (moveTowards)
 		{
-			decision.desiredPos = stimulus.targetPos;
+			decision.desiredMovePos = stimulus.targetPos;
+			//Debug.Log("closer");
 		}
 		else
 		{
-			decision.desiredPos = stimulus.curPos - delta;	
+			decision.desiredMovePos = stimulus.curPos - delta;	
+			//Debug.Log("away");
 		}
 		if (decision.jumpDuration <= 0f)
 		{
-			decision.shouldJump = UnityEngine.Random.Range(0,10) > 8;
+			decision.shouldJump = UnityEngine.Random.Range(0,10) > 6;
 			decision.jumpDuration = 2f;
+			//Debug.Log("trytojump");
 		}
-		if (decision.shootDuration <= 0f)
+		if (moveTowards && decision.shootDuration <= 0f)
 		{
 			decision.shouldShoot = UnityEngine.Random.Range(0,10) > 2;
 			decision.shootDuration = 1.5f;
+			//Debug.Log("trytoshoot");
 		}
 		
 		return decision;
@@ -149,14 +156,16 @@ public class TauAI : MonoBehaviour
 	{
 		float axisX = 0f;
 		float axisY = 0f;
-		float deltaX = decision.desiredPos.x - controller.posX;
-		float deltaY = decision.desiredPos.y - controller.posY;
+		float deltaX = decision.desiredMovePos.x - controller.posX;
+		float deltaY = decision.desiredMovePos.y - controller.posY;
 		axisX = Mathf.Clamp(deltaX, -1f, 1f);
 		//axisY = Mathf.Clamp(deltaY, -1f, 1f);
 		axisY = decision.shouldJump ? 1f : 0f;
 		controller.HandleAxis(axisX, axisY);
 		
-		controller.SetAim(deltaX, deltaY);
+		float aimX = decision.desiredShootPos.x - controller.posX;
+		float aimY = decision.desiredShootPos.y - controller.posY;
+		controller.SetAim(aimX, aimY);
 
 
 		if (decision.shouldShoot)
