@@ -14,12 +14,13 @@ public struct ControllerData
 	public float crouchDuration;
 	public float chargeDuration;
 	public float reloadDuration;
+	public float painDuration;
 }
 
 public class TauController : MonoBehaviour
 {
 	public TauActor actor;
-	private ControllerData cData;
+	public ControllerData cData;
 
 	public InputButtonType shootButton;
 	public InputButtonType retrieveButton;
@@ -46,6 +47,7 @@ public class TauController : MonoBehaviour
 	public float crouchDuration = -1f;
 	public float chargeDuration = -1f;
 	public float reloadDuration = -1f;
+	public float painDuration = -1f;
 	
 	public bool didCrouch = false;
 	public bool isShooting = false;
@@ -54,7 +56,7 @@ public class TauController : MonoBehaviour
 	public bool CanJump { get { return ValidJump && jumpDuration <= 0f && landDuration <= 0f; } }
 	public bool CanLand { get { return !isFlying && jumpDuration <= 0f && landDuration <= 0f; } }
 	public bool CanCrouch { get { return !isFlying && crouchDuration <= 0f; } }
-	public bool CanReload { get { return reloadDuration <= 0f; } }
+	public bool CanReload { get { return reloadDuration <= 0f && cData.reloadDuration > 0f; } }
 	
 
 
@@ -67,11 +69,9 @@ public class TauController : MonoBehaviour
 		{
 			InputManager.Instance.AddInput(HandleAxis);
 			InputManager.Instance.AddInput(HandleButton);
-			cData = Globals.HeroCData;
 		}
 		else
 		{
-			cData = Globals.BaddieCData;	
 			actor.ai = this.gameObject.AddComponent<TauAI>();
 			actor.ai.InitStart(actor, this);
 		}
@@ -93,6 +93,7 @@ public class TauController : MonoBehaviour
     	if (landDuration > 0f) { landDuration -= deltaTime; }
     	if (chargeDuration > 0f) { chargeDuration -= deltaTime; }
     	if (reloadDuration > 0f) { reloadDuration -= deltaTime; }
+    	if (painDuration > 0f) { painDuration -= deltaTime; }
     	if (crouchDuration > 0f) 
     	{ 
     		crouchDuration -= deltaTime; 
@@ -135,7 +136,7 @@ public class TauController : MonoBehaviour
 	{
 		if (bType == this.shootButton)
 		{
-			if (actor.currentArrow != null)
+			if (actor.currentWeapon != null)
 			{
 				if (isDown && !isShooting)
 				{
@@ -154,7 +155,7 @@ public class TauController : MonoBehaviour
 			{
 				if (isDown && CanReload)
 				{
-					actor.AddArrow(TauDirector.Instance.factory.GetNextArrow());
+					actor.AddWeapon(TauWorld.Instance.CreateKnife());
 				}
 			}
 		}
@@ -226,6 +227,7 @@ public class TauController : MonoBehaviour
 	    	}
 	    	contactFloors.Add(coll.gameObject);
     	}
+
     }
 
     public void OnCollisionExit2D(Collision2D coll)
@@ -238,5 +240,10 @@ public class TauController : MonoBehaviour
 	    	}
 	    	contactFloors.Remove(coll.gameObject);
 	    }
+    }
+
+    public void TakeDamage()
+    {
+    	painDuration = cData.painDuration;
     }
 }

@@ -31,13 +31,13 @@ public enum SpriteAction
 public enum SpriteFace
 {
 	GHOST,
-	GHOST_HURT,
+	GHOST_PAIN,
 	BUG,
-	BUG_HURT,
+	BUG_PAIN,
 	SNEAK,
-	SNEAK_HURT,
+	SNEAK_PAIN,
 	ALIEN,
-	ALIEN_HURT,
+	ALIEN_PAIN,
 }
 
 
@@ -53,22 +53,42 @@ public class TauBody : MonoBehaviour
 	public SpriteRenderer bowSprite;
 	public SpriteRenderer faceSprite;
 	public bool faceLeft = true;
+    public bool hasPain = false;
 
 	
 	public void InitStart(TauActor p_actor)
 	{
 		actor = p_actor;
 		SetSprite(SpriteAction.AIMSTRAIGHT);
-		SetSprite(SpriteFace.BUG);
+		
 	}
 	public void InitFinish()
 	{
+        SetSprite(actor.aData.mainSprite);
 	}
 
 	public void SetActive(bool val)
 	{
 
 	}
+
+    public void CheckPain()
+    {
+        bool shouldHavePain = (actor.controller.painDuration > 0f);
+        if (hasPain == shouldHavePain)
+        {
+            return;
+        }
+        hasPain = shouldHavePain;
+        if (!hasPain)
+        {
+            SetSprite(actor.aData.mainSprite);       
+        }
+        else
+        {
+            SetSprite(actor.aData.painSprite);
+        }
+    }
 
 	public void CheckFacing()
 	{
@@ -78,8 +98,8 @@ public class TauBody : MonoBehaviour
 			return;
 		}
 		faceLeft = shouldFaceLeft;
-		Vector3 newScale = Vector3.one;
-		newScale.x = faceLeft ? 1f : -1f;
+		Vector3 newScale = actor.scale * Vector3.one;
+		newScale.x *= faceLeft ? 1f : -1f;
 		bodySprite.gameObject.transform.localScale = newScale;
 		if (bowSprite != null)
 		{
@@ -111,6 +131,7 @@ public class TauBody : MonoBehaviour
 
     public void Update()
     {
+        CheckPain();
     	CheckFacing();
     	
     	{
@@ -135,7 +156,7 @@ public class TauBody : MonoBehaviour
     			SetSprite(GetAim());	
     		}
     	}
-    	actor.CheckArrow();
+    	actor.CheckWeapon();
     }
 
     public void SetSprite(SpriteFace val)

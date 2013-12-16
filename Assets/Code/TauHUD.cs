@@ -50,7 +50,7 @@ public class TauHUD : MonoBehaviour
             {
                 mouseSprite.sprite = mouseSprites[2];
             }
-            else if (focused.actor.currentArrow == null)
+            else if (focused.actor.currentWeapon == null)
             {
                 mouseSprite.sprite = mouseSprites[1];
             }

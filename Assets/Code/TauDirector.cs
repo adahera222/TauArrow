@@ -10,8 +10,11 @@ public class TauDirector : MonoBehaviour
 	public TauFactory factory;
 	public TauWorld world;
 	public TauLevel level;
+	public TauActor hero;
 
 	public bool isInit = false;
+	public int enemyCount = 1;
+	public bool isSpawning = false;
 
 	public TauDirector()
 	{
@@ -35,33 +38,66 @@ public class TauDirector : MonoBehaviour
 		{
 			yield return null;
 		}
-		TauActor hero = world.CreateHero();
+		StartCoroutine(StartHero());
+		while(!hero.isInit)
+		{
+			yield return null;
+		}
+
+		TauObject arrow = world.CreateArrow();
+		hero.AddWeapon(arrow);
+
+		StartCoroutine(StartBaddies(enemyCount));
+		isInit = true;
+
+		audio.loop = true;
+		audio.Play();
+	}
+
+	IEnumerator StartHero()
+	{
+		hero = world.CreateHero();
 		while(!hero.isInit)
 		{
 			yield return null;
 		}
 		TauHUD.Instance.focused = hero.controller;
 
-		TauObject arrow = world.CreateArrow();
-		hero.AddArrow(arrow);
+	}
 
-		for(int i=0; i<3; ++i)
+	IEnumerator StartBaddies(int count)
+	{
+		isSpawning = true;
+		for(int i=0; i<count; ++i)
 		{
+			yield return new WaitForSeconds(2f);
 			TauActor baddie = world.CreateBaddie();	
 			while(!baddie.isInit)
 			{
 				yield return null;
 			}
+			
 		}
-		isInit = true;
-
-		audio.loop = true;
-		audio.Play();
+		isSpawning = false;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update () 
+	{
+		int desiredCount = enemyCount;
+		if (hero.isAlive)
+		{
+			desiredCount++;
+		}
+		else
+		{
+			StartCoroutine(StartHero());
+		}
+
+		if (!isSpawning && world.ActorCount < desiredCount)
+		{
+			StartCoroutine(StartBaddies(desiredCount - world.ActorCount));
+		}
 	}
 
 }

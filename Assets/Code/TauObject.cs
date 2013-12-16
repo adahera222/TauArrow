@@ -22,6 +22,8 @@ public class TauObject : MonoBehaviour
 	//public Rigidbody2D rigidbody;
 	//public BoxCollider2D collider;
 	public SpriteRenderer objSprite;
+	public float scale = 1f;
+	public float disappearTimer = -1f;
 	public float physicsTimer = -1f;
 	
 	public bool isInit = false;
@@ -31,7 +33,7 @@ public class TauObject : MonoBehaviour
 	}
 	public virtual void InitStart()
 	{
-		InitFinish();
+		
 	}
 	public virtual void InitFinish()
 	{
@@ -54,6 +56,18 @@ public class TauObject : MonoBehaviour
 				SetPhysicsEnabled(true);    			
     		}
     	}
+    	if (disappearTimer > 0f) 
+    	{ 
+    		disappearTimer -= deltaTime; 
+    		if (disappearTimer <= 0f)
+    		{
+				TauWorld.Instance.Kill(this);    			
+    		}
+    	}
+
+
+
+
     	if (collider2D.enabled && !rigidbody2D.isKinematic)
     	{
     		if (Mathf.Abs(rigidbody2D.velocity.x) > 0 || Mathf.Abs(rigidbody2D.velocity.y) > 0)
@@ -67,6 +81,8 @@ public class TauObject : MonoBehaviour
 				this.transform.localEulerAngles = velocityAngles;	    		
 	    	}	    		 
     	}
+    	
+
     }
 
     public void SetPhysicsEnabled(bool val)
@@ -78,5 +94,54 @@ public class TauObject : MonoBehaviour
     public void DelayedPhysics(float timer)
     {
     	physicsTimer = timer;
+    }
+
+    public void FlushPhysics()
+    {
+    	rigidbody2D.velocity *= 0f;
+    	HingeJoint2D hinge = this.gameObject.GetComponent<HingeJoint2D>();
+    	if (hinge != null)
+    	{
+    		hinge.anchor = Vector3.zero;
+    		hinge.enabled = false;
+    		hinge.connectedBody = null;
+    	}
+    }
+
+    public void OnCollisionEnter2D(Collision2D coll)
+    {
+    	if (this.gameObject.tag == Globals.ARROW || this.gameObject.tag == Globals.KNIFE)
+    	{
+    		if (coll != null && coll.gameObject != null)
+    		{
+		    	if (coll.gameObject.tag == Globals.TERRAIN)
+		    	{
+		    		SetPhysicsEnabled(false);
+		    		if (this.gameObject.tag == Globals.KNIFE)
+		    		{
+		    			disappearTimer = 2f;		
+		    		}
+		    	}
+		    	if (coll.gameObject.tag == Globals.ACTOR)
+		    	{
+		    		this.gameObject.collider2D.enabled = false;
+
+		    		HingeJoint2D hinge = this.gameObject.GetComponent<HingeJoint2D>();
+		    		if (hinge == null)
+		    		{
+		    			hinge = this.gameObject.AddComponent<HingeJoint2D>();
+		    		}
+		    		hinge.enabled = true;
+		    		hinge.connectedBody = coll.gameObject.rigidbody2D;
+		    		hinge.anchor = this.gameObject.transform.position - coll.gameObject.transform.position;    		
+
+		    		TauActor hitActor = coll.gameObject.GetComponent<TauActor>();
+		    		if (hitActor != null)
+		    		{
+		    			hitActor.TakeDamage();
+		    		}
+		    	}
+		    }
+	    }
     }
 }

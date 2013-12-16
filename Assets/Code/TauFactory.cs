@@ -26,8 +26,9 @@ public class TauFactory : MonoBehaviour
 
     public GameObject sPrototypeChunk;
     public GameObject sPrototypeHero;
-    public GameObject sPrototypeArrow;
     public GameObject sPrototypeBaddie;
+    public GameObject sPrototypeArrow;
+    public GameObject sPrototypeKnife;
 
 
     public List<TauChunk> mChunkList;
@@ -51,6 +52,7 @@ public class TauFactory : MonoBehaviour
             toAdd.SetActive(false);
             TauChunk toAddChunk = toAdd.GetComponent<TauChunk>();
             toAddChunk.InitStart();
+            toAddChunk.InitFinish();
             mChunkList.Add(toAddChunk); 
         }
         mLastChunkIndex = 0;
@@ -75,13 +77,7 @@ public class TauFactory : MonoBehaviour
         return toAddActor;
     }
 
-    public TauObject GetNextArrow()
-    {
-        GameObject toAdd = Instantiate(sPrototypeArrow, new Vector3(0,0,0), Quaternion.identity) as GameObject;
-        TauObject toAddObject = toAdd.GetComponent<TauObject>();       
-        return toAddObject;
-    }
-
+  
     public TauActor GetNextBaddie()
     {
         GameObject toAdd = Instantiate(sPrototypeBaddie, new Vector3(0,0,0), Quaternion.identity) as GameObject;
@@ -91,6 +87,19 @@ public class TauFactory : MonoBehaviour
         return toAddActor;
     }
 
+    public TauObject GetNextArrow()
+    {
+        GameObject toAdd = Instantiate(sPrototypeArrow, new Vector3(0,0,0), Quaternion.identity) as GameObject;
+        TauObject toAddObject = toAdd.GetComponent<TauObject>();       
+        return toAddObject;
+    }
+
+    public TauObject GetNextKnife()
+    {
+        GameObject toAdd = Instantiate(sPrototypeKnife, new Vector3(0,0,0), Quaternion.identity) as GameObject;
+        TauObject toAddObject = toAdd.GetComponent<TauObject>();       
+        return toAddObject;
+    }
 
 
 }

@@ -21,6 +21,8 @@ public struct ActorData
 {
     public int HP;
     public int weapon;
+    public SpriteFace mainSprite;
+    public SpriteFace painSprite;
 }
 
 
@@ -31,10 +33,12 @@ public class TauActor : TauObject
     public TauBody body;
     public TauAI ai;
 	public bool isHuman = true;
+    public bool isAlive = true;
     public int HP = 10;
     public int weapon = 0;
+
 	
-	public TauObject currentArrow;
+	public TauObject currentWeapon;
     public TauObject retrieveArrow;
 	
 
@@ -48,19 +52,12 @@ public class TauActor : TauObject
 		controller.InitStart(this);
         body = this.GetComponent<TauBody>();
         body.InitStart(this);
-        if (isHuman)
-        {
-            aData = Globals.HeroAData;
-        }
-        else
-        {
-            aData = Globals.BaddieAData;    
-        }
 		base.InitStart();
 	}
 	public override void InitFinish()
 	{
         HP = aData.HP;
+        isAlive = true;
 		controller.InitFinish();
         body.InitFinish();
 		base.InitFinish();
@@ -75,26 +72,35 @@ public class TauActor : TauObject
     public override void Update()
     {
     	CheckRetrieveArrow();
+        CheckFallBottom();
     }
 
-    public void AddArrow(TauObject obj)
+    public void CheckFallBottom()
+    {
+        if (controller.posY < -5)
+        {
+            TauWorld.Instance.Kill(this);
+        }
+    }
+
+    public void AddWeapon(TauObject obj)
     {
     	obj.SetPhysicsEnabled(false);
-    	currentArrow = obj;
+    	currentWeapon = obj;
     	body.CheckFacing();
-    	CheckArrow();
+    	CheckWeapon();
     }
 
-    public void CheckArrow()
+    public void CheckWeapon()
     {
 
-    	if (currentArrow != null)
+    	if (currentWeapon != null)
     	{
-    		currentArrow.transform.localScale = body.bodySprite.gameObject.transform.localScale;
+    		currentWeapon.transform.localScale = currentWeapon.scale*body.bodySprite.gameObject.transform.localScale;
 
     		Vector3 arrowPos = this.transform.position;
     		Vector3 arrowAngles = Vector3.zero;
-    		float arrowScaleX = currentArrow.transform.localScale.x;
+    		float arrowScaleX = currentWeapon.transform.localScale.x;
     		switch (body.currentAction)
     		{
     			case SpriteAction.AIMDOWN:
@@ -102,7 +108,7 @@ public class TauActor : TauObject
     				arrowPos.x += arrowScaleX*Globals.ARROW_POS_DOWN.x;
     				arrowPos.y += Globals.ARROW_POS_DOWN.y;
     				arrowAngles.z += arrowScaleX*Globals.ARROW_ROT_DOWN;
-    				currentArrow.objSprite.enabled = true;
+    				currentWeapon.objSprite.enabled = true;
     				break;
     			}
     			case SpriteAction.AIMUP:
@@ -110,7 +116,7 @@ public class TauActor : TauObject
     				arrowPos.x += arrowScaleX*Globals.ARROW_POS_UP.x;
     				arrowPos.y += Globals.ARROW_POS_UP.y;
     				arrowAngles.z += arrowScaleX*Globals.ARROW_ROT_UP;
-    				currentArrow.objSprite.enabled = true;
+    				currentWeapon.objSprite.enabled = true;
     				break;
     			}
     			case SpriteAction.AIMSTRAIGHT:
@@ -118,33 +124,33 @@ public class TauActor : TauObject
     				arrowPos.x += arrowScaleX*Globals.ARROW_POS_STRAIGHT.x;
     				arrowPos.y += Globals.ARROW_POS_STRAIGHT.y;
     				arrowAngles.z += arrowScaleX*Globals.ARROW_ROT_STRAIGHT;
-    				currentArrow.objSprite.enabled = true;
+    				currentWeapon.objSprite.enabled = true;
     				break;
     			}
     			default:
     			{
-    				currentArrow.objSprite.enabled = false;
+    				currentWeapon.objSprite.enabled = false;
     				break;
     			}
     		}
-    		currentArrow.transform.position = arrowPos;
-    		currentArrow.transform.localEulerAngles = arrowAngles;
+    		currentWeapon.transform.position = arrowPos;
+    		currentWeapon.transform.localEulerAngles = arrowAngles;
     	}
     }
 
     public void ShootArrow(bool hasCharged)
     {
-    	if (currentArrow != null)
+    	if (currentWeapon != null)
     	{
-    		float arrowScaleX = currentArrow.transform.localScale.x;
-	    	float launchZ = arrowScaleX * currentArrow.transform.localEulerAngles.z * Mathf.Deg2Rad;
+    		float arrowScaleX = currentWeapon.transform.localScale.x;
+	    	float launchZ = arrowScaleX * currentWeapon.transform.localEulerAngles.z * Mathf.Deg2Rad;
 	    	float launchStrength = hasCharged ? 70f : 40f;
 	    	float forceX = arrowScaleX * launchStrength * Mathf.Cos(launchZ);
 	    	float forceY = launchStrength * Mathf.Sin(launchZ);
-	    	currentArrow.rigidbody2D.isKinematic = false;
-	    	currentArrow.rigidbody2D.AddForce(new Vector2(forceX,forceY));
-			currentArrow.DelayedPhysics(0.2f);
-	    	currentArrow = null;
+	    	currentWeapon.rigidbody2D.isKinematic = false;
+	    	currentWeapon.rigidbody2D.AddForce(new Vector2(forceX,forceY));
+			currentWeapon.DelayedPhysics(0.2f);
+	    	currentWeapon = null;
 	    }
     }
 
@@ -153,7 +159,7 @@ public class TauActor : TauObject
         if (retrieveArrow == null)
         {
             retrieveArrow = TauWorld.Instance.FindArrow(this);
-            retrieveArrow.rigidbody2D.velocity *= 0f;
+            retrieveArrow.FlushPhysics();
         }
 
     }
@@ -165,7 +171,7 @@ public class TauActor : TauObject
             float deltaY = controller.posY - retrieveArrow.gameObject.transform.position.y;
             if (Mathf.Abs(deltaX) < 1f && Mathf.Abs(deltaY) < 1f)
             {
-                AddArrow(retrieveArrow);
+                AddWeapon(retrieveArrow);
                 retrieveArrow = null;
             }
             else
@@ -178,6 +184,16 @@ public class TauActor : TauObject
                 retrieveArrow.collider2D.enabled = false;
                 retrieveArrow.rigidbody2D.AddForce(new Vector2(forceX, forceY));
             }
+        }
+    }
+
+    public void TakeDamage()
+    {
+        HP -= 10;
+        controller.TakeDamage();
+        if (HP <= 0)
+        {
+            TauWorld.Instance.Kill(this);
         }
     }
 
