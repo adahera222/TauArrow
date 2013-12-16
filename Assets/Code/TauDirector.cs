@@ -13,7 +13,7 @@ public class TauDirector : MonoBehaviour
 	public TauActor hero;
 
 	public bool isInit = false;
-	public int enemyCount = 4;
+	private int enemyCount = 4;
 	public bool isSpawning = false;
 
 	public TauDirector()
@@ -48,7 +48,7 @@ public class TauDirector : MonoBehaviour
 		TauObject arrow = world.CreateArrow();
 		hero.AddWeapon(arrow);
 
-		StartCoroutine(StartBaddies(enemyCount));
+		
 		isInit = true;
 
 		audio.loop = true;
@@ -95,9 +95,11 @@ public class TauDirector : MonoBehaviour
 			StartCoroutine(StartHero());
 		}
 
-		if (!isSpawning && world.ActorCount < desiredCount)
+		int diff = desiredCount - world.ActorCount;
+		if (!isSpawning && diff > 0)
 		{
-			StartCoroutine(StartBaddies(desiredCount - world.ActorCount));
+			Debug.Log("spawn "+diff+"actor="+world.ActorCount);
+			StartCoroutine(StartBaddies(diff));
 		}
 	}
 
