@@ -46,10 +46,10 @@ public class Globals
 
 
 		BaddieCData = new ControllerData();
-		BaddieCData.normalJumpForce = 200f;
-		BaddieCData.crouchJumpForce = 300f;
-		BaddieCData.runForce = 10f;
-		BaddieCData.flyForce = 2f;
+		BaddieCData.normalJumpForce = 200f*0.25f;//mass is 0.25f
+		BaddieCData.crouchJumpForce = 300f*0.25f;//mass is 0.25f
+		BaddieCData.runForce = 10f*0.25f;//mass is 0.25f
+		BaddieCData.flyForce = 2f*0.25f;//mass is 0.25f
 		BaddieCData.maxRunVelocity = 1f;
 		BaddieCData.jumpDuration = 0.5f;
 		BaddieCData.landDuration = 0.2f;
@@ -63,11 +63,11 @@ public class Globals
 		BaddieAData.weapon = 2;
 
 		GhostCData = new ControllerData();
-		GhostCData.normalJumpForce = 2f*BaddieCData.normalJumpForce;
-		GhostCData.crouchJumpForce = 2f*BaddieCData.crouchJumpForce;
-		GhostCData.runForce = 0.5f*BaddieCData.runForce;
+		GhostCData.normalJumpForce = 1.1f*BaddieCData.normalJumpForce;
+		GhostCData.crouchJumpForce = 1.1f*BaddieCData.crouchJumpForce;
+		GhostCData.runForce = 0.85f*BaddieCData.runForce;
 		GhostCData.flyForce = BaddieCData.flyForce;
-		GhostCData.maxRunVelocity = 0.5f*BaddieCData.maxRunVelocity;
+		GhostCData.maxRunVelocity = 0.85f*BaddieCData.maxRunVelocity;
 		GhostCData.jumpDuration = BaddieCData.jumpDuration;
 		GhostCData.landDuration = BaddieCData.landDuration;
 		GhostCData.crouchDuration = BaddieCData.crouchDuration;
@@ -82,8 +82,8 @@ public class Globals
 		GhostAData.painSprite = SpriteFace.GHOST_PAIN;
 
 		BugCData = new ControllerData();
-		BugCData.normalJumpForce = 0.5f*BaddieCData.normalJumpForce;
-		BugCData.crouchJumpForce = 0.5f*BaddieCData.crouchJumpForce;
+		BugCData.normalJumpForce = 0.95f*BaddieCData.normalJumpForce;
+		BugCData.crouchJumpForce = 0.95f*BaddieCData.crouchJumpForce;
 		BugCData.runForce = BaddieCData.runForce;
 		BugCData.flyForce = BaddieCData.flyForce;
 		BugCData.maxRunVelocity = BaddieCData.maxRunVelocity;
@@ -122,8 +122,8 @@ public class Globals
 
 
 		AlienCData = new ControllerData();
-		AlienCData.normalJumpForce = 0.25f*BaddieCData.normalJumpForce;
-		AlienCData.crouchJumpForce = 0.25f*BaddieCData.crouchJumpForce;
+		AlienCData.normalJumpForce = 0.85f*BaddieCData.normalJumpForce;
+		AlienCData.crouchJumpForce = 0.85f*BaddieCData.crouchJumpForce;
 		AlienCData.runForce = BaddieCData.runForce;
 		AlienCData.flyForce = BaddieCData.flyForce;
 		AlienCData.maxRunVelocity = BaddieCData.maxRunVelocity;

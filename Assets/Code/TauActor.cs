@@ -167,9 +167,13 @@ public class TauActor : TauObject
     {
         if (retrieveArrow != null)
         {
-            float deltaX = controller.posX - retrieveArrow.gameObject.transform.position.x;
-            float deltaY = controller.posY - retrieveArrow.gameObject.transform.position.y;
-            if (Mathf.Abs(deltaX) < 1f && Mathf.Abs(deltaY) < 1f)
+            float arrowPosX = retrieveArrow.gameObject.transform.position.x;
+            float arrowPosY = retrieveArrow.gameObject.transform.position.y;
+            float deltaX = controller.posX - arrowPosX;
+            float deltaY = controller.posY - arrowPosY;
+            bool isClose = Mathf.Abs(deltaX) < 1f && Mathf.Abs(deltaY) < 1f;
+            bool isOutside = arrowPosX < -10f || arrowPosX > 10f || arrowPosY < -10f || arrowPosY > -10f;
+            if (isClose || isOutside)
             {
                 AddWeapon(retrieveArrow);
                 retrieveArrow = null;

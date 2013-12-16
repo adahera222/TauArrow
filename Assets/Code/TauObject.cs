@@ -99,12 +99,12 @@ public class TauObject : MonoBehaviour
     public void FlushPhysics()
     {
     	rigidbody2D.velocity *= 0f;
-    	HingeJoint2D hinge = this.gameObject.GetComponent<HingeJoint2D>();
-    	if (hinge != null)
+    	DistanceJoint2D joint = this.gameObject.GetComponent<DistanceJoint2D>();
+    	if (joint != null)
     	{
-    		hinge.anchor = Vector3.zero;
-    		hinge.enabled = false;
-    		hinge.connectedBody = null;
+    		joint.anchor = Vector3.zero;
+    		joint.enabled = false;
+    		joint.connectedBody = null;
     	}
     }
 
@@ -126,14 +126,18 @@ public class TauObject : MonoBehaviour
 		    	{
 		    		this.gameObject.collider2D.enabled = false;
 
-		    		HingeJoint2D hinge = this.gameObject.GetComponent<HingeJoint2D>();
-		    		if (hinge == null)
+		    		DistanceJoint2D joint = this.gameObject.GetComponent<DistanceJoint2D>();
+		    		if (joint == null)
 		    		{
-		    			hinge = this.gameObject.AddComponent<HingeJoint2D>();
+		    			joint = this.gameObject.AddComponent<DistanceJoint2D>();
 		    		}
-		    		hinge.enabled = true;
-		    		hinge.connectedBody = coll.gameObject.rigidbody2D;
-		    		hinge.anchor = this.gameObject.transform.position - coll.gameObject.transform.position;    		
+		    		joint.enabled = true;
+		    		joint.connectedBody = coll.gameObject.rigidbody2D;
+		    		//joint.anchor = this.gameObject.transform.position - coll.gameObject.transform.position;    		
+		    		//joint.anchor *= 0.5f;
+		    		//joint.connectedAnchor = -joint.anchor;
+		    		Vector3 delta = this.gameObject.transform.position - coll.gameObject.transform.position;
+		    		joint.distance = delta.magnitude;
 
 		    		TauActor hitActor = coll.gameObject.GetComponent<TauActor>();
 		    		if (hitActor != null)

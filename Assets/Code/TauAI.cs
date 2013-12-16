@@ -29,6 +29,8 @@ public class TauAI_Decision
 	public Vector2 desiredPos;
 	public bool shouldShoot;
 	public bool shouldJump;
+	public float jumpDuration = -1f;
+	public float shootDuration = -1f;
 }
 
 public abstract class TauAI_Base
@@ -36,6 +38,7 @@ public abstract class TauAI_Base
 	protected TauAI_Decision decision;
 	
 	public abstract TauAI_Decision Think(TauAI_Stimulus stimulus);
+	public abstract void Update(float deltaTime);
 }            
 
 public class TauAI_Wander : TauAI_Base
@@ -44,11 +47,35 @@ public class TauAI_Wander : TauAI_Base
 	{
 		decision = new TauAI_Decision();
 	}
+
+	public override void Update(float deltaTime)
+	{
+		if (decision.shootDuration > 0f) { decision.shootDuration -= deltaTime; }
+		if (decision.jumpDuration > 0f) { decision.jumpDuration -= deltaTime; }
+	}
+
 	public override TauAI_Decision Think(TauAI_Stimulus stimulus)
 	{
-		decision.desiredPos = stimulus.targetPos;
-		decision.shouldShoot = true;
-		decision.shouldJump = false;
+		Vector2 delta = stimulus.targetPos - stimulus.curPos;
+		if (delta.sqrMagnitude > 20f)
+		{
+			decision.desiredPos = stimulus.targetPos;
+		}
+		else
+		{
+			decision.desiredPos = stimulus.curPos - delta;	
+		}
+		if (decision.jumpDuration <= 0f)
+		{
+			decision.shouldJump = UnityEngine.Random.Range(0,10) > 8;
+			decision.jumpDuration = 2f;
+		}
+		if (decision.shootDuration <= 0f)
+		{
+			decision.shouldShoot = UnityEngine.Random.Range(0,10) > 2;
+			decision.shootDuration = 1.5f;
+		}
+		
 		return decision;
 	}
 }
@@ -98,6 +125,7 @@ public class TauAI : MonoBehaviour
 			scanDuration = 0.2f;
 			Scan(ref stimulus);
 		}
+		state.Update(deltaTime);
 		decision = state.Think(stimulus);
 		React(decision);
 
