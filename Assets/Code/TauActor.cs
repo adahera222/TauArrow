@@ -159,7 +159,10 @@ public class TauActor : TauObject
         if (retrieveArrow == null)
         {
             retrieveArrow = TauWorld.Instance.FindArrow(this);
-            retrieveArrow.FlushPhysics();
+            if (retrieveArrow != null)
+            {
+                retrieveArrow.FlushPhysics();
+            }
         }
 
     }
@@ -172,7 +175,7 @@ public class TauActor : TauObject
             float deltaX = controller.posX - arrowPosX;
             float deltaY = controller.posY - arrowPosY;
             bool isClose = Mathf.Abs(deltaX) < 1f && Mathf.Abs(deltaY) < 1f;
-            bool isOutside = arrowPosX < -10f || arrowPosX > 10f || arrowPosY < -10f || arrowPosY > -10f;
+            bool isOutside = arrowPosX < -10f || arrowPosX > 10f || arrowPosY < -10f || arrowPosY > 10f;
             if (isClose || isOutside)
             {
                 AddWeapon(retrieveArrow);
@@ -182,8 +185,8 @@ public class TauActor : TauObject
             {
                 Vector2 deltaDir = new Vector2(deltaX, deltaY);
                 deltaDir.Normalize();
-                float forceX = deltaDir.x*30f;
-                float forceY = deltaDir.y*30f;
+                float forceX = deltaDir.x*22f;
+                float forceY = deltaDir.y*22f;
                 retrieveArrow.rigidbody2D.isKinematic = false;
                 retrieveArrow.collider2D.enabled = false;
                 retrieveArrow.rigidbody2D.AddForce(new Vector2(forceX, forceY));
