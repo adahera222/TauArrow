@@ -106,6 +106,7 @@ public class TauObject : MonoBehaviour
     		joint.enabled = false;
     		joint.connectedBody = null;
     	}
+    	rigidbody2D.mass = 0.1f;
     }
 
     public void OnCollisionEnter2D(Collision2D coll)
@@ -125,6 +126,7 @@ public class TauObject : MonoBehaviour
 		    	if (coll.gameObject.tag == Globals.ACTOR)
 		    	{
 		    		this.gameObject.collider2D.enabled = false;
+		    		this.rigidbody2D.mass = 0f;
 
 		    		DistanceJoint2D joint = this.gameObject.GetComponent<DistanceJoint2D>();
 		    		if (joint == null)
@@ -138,6 +140,7 @@ public class TauObject : MonoBehaviour
 		    		//joint.connectedAnchor = -joint.anchor;
 		    		Vector3 delta = this.gameObject.transform.position - coll.gameObject.transform.position;
 		    		joint.distance = delta.magnitude;
+
 
 		    		TauActor hitActor = coll.gameObject.GetComponent<TauActor>();
 		    		if (hitActor != null)

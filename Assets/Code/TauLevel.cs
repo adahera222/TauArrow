@@ -31,23 +31,34 @@ public class TauLevelData
     public TauLevelData(string filename)
     {
         mData = new List<TerrainData>();
-        float newY = -4f;
+        float newY = -5f;
+        float lastSlope = 0f;
         for(int i=0; i<100; ++i)
         {
             float newX = i-50f;
             
             int rand = Random.Range(0,10);
-            if (rand > 8)
+            if (rand > 9 && newY < -3f)
             {
-                newY++;
+                lastSlope += 2;
             }
-            else if (rand > 6)
+            else if (rand > 8 && newY > -7f)
             {
-                newY--;
+                lastSlope -= 2;
             }
-            newY = Mathf.Clamp(newY, -10f, -1f);   
+            else if (rand > 6 && newY < -3f)
+            {
+                lastSlope += 1;
+            }
+            else if (rand > 4 && newY > -7f)
+            {
+                lastSlope -= 1;
+            }
+            lastSlope = Mathf.Clamp(lastSlope, -2f, 2f);
+            newY += lastSlope;
+            newY = Mathf.Clamp(newY, -7f, -3f);   
             
-            mData.Add(new TerrainData{ mType = TerrainType.FLOOR_SQUARE, x=newX*0.3f, y=newY*0.3f} );
+            mData.Add(new TerrainData{ mType = TerrainType.FLOOR_SQUARE, x=newX*0.37f, y=newY*0.37f} );
         }
     }
 }

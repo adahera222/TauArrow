@@ -61,6 +61,7 @@ public class TauWorld : MonoBehaviour
         TauActor hero = factory.GetNextHero();
         actorList.Add(hero);
         hero.gameObject.transform.position = new Vector3(0f,1f,0f);
+        hero.isHuman = true;
         hero.InitStart();
         hero.controller.cData = Globals.HeroCData;
         hero.aData = Globals.HeroAData;
@@ -74,6 +75,7 @@ public class TauWorld : MonoBehaviour
         actorList.Add(baddie);
         float startX = (UnityEngine.Random.Range(0,2) == 0) ? -5f : 5f;
         baddie.gameObject.transform.position = new Vector3(startX,1f,0f);
+        baddie.isHuman = false;
         baddie.InitStart();
         switch(UnityEngine.Random.Range(0,4))
         {

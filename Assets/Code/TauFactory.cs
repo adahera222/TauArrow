@@ -72,8 +72,6 @@ public class TauFactory : MonoBehaviour
     {
         GameObject toAdd = Instantiate(sPrototypeHero, new Vector3(0,0,0), Quaternion.identity) as GameObject;
         TauActor toAddActor = toAdd.GetComponent<TauActor>();
-        toAddActor.isHuman = true;
-        
         return toAddActor;
     }
 
@@ -81,9 +79,7 @@ public class TauFactory : MonoBehaviour
     public TauActor GetNextBaddie()
     {
         GameObject toAdd = Instantiate(sPrototypeBaddie, new Vector3(0,0,0), Quaternion.identity) as GameObject;
-
         TauActor toAddActor = toAdd.GetComponent<TauActor>();
-        toAddActor.isHuman = false;
         return toAddActor;
     }
 
