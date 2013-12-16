@@ -36,11 +36,7 @@ public class InputManager : MonoBehaviour
 	public InputManager()
 	{
 		instance = this;
-	}
-	
 
-	void Start () 
-	{
 		HandleKey = DefaultHandleKey;
 		HandleAxis = DefaultHandleAxis;
 		HandleButton = DefaultHandleButton;

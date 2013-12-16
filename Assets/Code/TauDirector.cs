@@ -51,8 +51,6 @@ public class TauDirector : MonoBehaviour
 		StartCoroutine(StartBaddies(enemyCount));
 		isInit = true;
 
-		world.Kill(hero);
-
 		audio.loop = true;
 		audio.Play();
 	}

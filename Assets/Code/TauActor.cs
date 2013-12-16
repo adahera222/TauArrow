@@ -32,8 +32,8 @@ public class TauActor : TauObject
 	public TauController controller;
     public TauBody body;
     public TauAI ai;
-	public bool isHuman = true;
-    public bool isAlive = true;
+	public bool isHuman = false;
+    public bool isAlive = false;
     public int HP = 10;
     public int weapon = 0;
 

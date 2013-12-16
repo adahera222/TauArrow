@@ -38,6 +38,7 @@ public enum SpriteFace
 	SNEAK_PAIN,
 	ALIEN,
 	ALIEN_PAIN,
+    NONE,
 }
 
 
@@ -60,6 +61,7 @@ public class TauBody : MonoBehaviour
 	{
 		actor = p_actor;
 		SetSprite(SpriteAction.AIMSTRAIGHT);
+        currentFace = SpriteFace.NONE;
 		
 	}
 	public void InitFinish()

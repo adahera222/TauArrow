@@ -67,6 +67,7 @@ public class TauController : MonoBehaviour
 		retrieveButton = InputButtonType.MOUSE_RIGHT;
 		if (actor.isHuman)
 		{
+			//Debug.Log(p_actor+" add input");
 			InputManager.Instance.AddInput(HandleAxis);
 			InputManager.Instance.AddInput(HandleButton);
 		}
